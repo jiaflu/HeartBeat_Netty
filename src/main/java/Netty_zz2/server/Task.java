@@ -3,8 +3,7 @@ package Netty_zz2.server;
 import java.io.Serializable;
 
 /**
- * @author zz
- * @date 2018/8/5 10:54
+ * Created by lujiafeng on 2018/7/28.
  */
 public class Task implements Serializable{
     private int deviceNO;

@@ -9,8 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author zz
- * @date 2018/7/19 11:35
+ * Created by lujiafeng on 2018/7/28.
  */
 public class AssignTaskMsg implements Serializable {
     private static final long serialVersionUID = 3L;

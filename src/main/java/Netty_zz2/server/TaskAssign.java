@@ -9,8 +9,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @author zz
- * @date 2018/8/1 15:29
+ * Created by lujiafeng on 2018/7/28.
  */
 public class TaskAssign {
     private StatusMsg statusMsg;
