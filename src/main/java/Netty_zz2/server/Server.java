@@ -36,16 +36,17 @@ public class Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
-                            //检测连接有效性（心跳）,此处功能：10秒内read()未被调用则触发一次useEventTrigger()方法
-                            ch.pipeline().addLast(new IdleStateHandler(3, 0, 0, TimeUnit.SECONDS));
-                            //JBossMarshalling外部依赖，进行编解码
-                            ch.pipeline().addLast("encoder", MarshallingCodeCFactory.buildMarshallingEncoder());
-                            ch.pipeline().addLast("decoder", MarshallingCodeCFactory.buildMarshallingDecoder());
-                            ch.pipeline().addLast(new ServerHandler());  //ServerHandler实现了业务逻辑
+                            //检测连接有效性（心跳）,此处功能：3秒内read()未被调用则触发一次useEventTrigger()方法
+                            ch.pipeline().addLast(new IdleStateHandler(3, 0, 0, TimeUnit.SECONDS))
+
+                                    //JBossMarshalling外部依赖，进行编解码
+                                    .addLast("encoder", MarshallingCodeCFactory.buildMarshallingEncoder())
+                                    .addLast("decoder", MarshallingCodeCFactory.buildMarshallingDecoder())
+                                    .addLast(new ServerHandler());  //ServerHandler实现了业务逻辑
                         }
                     })
                     //服务端接受连接的队列长度，如果队列已满，客户端连接将被拒绝
-                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
                     //Socket参数，连接保活，默认值为False。启用该功能时，TCP会主动探测空闲连接的有效性。
                     // 可以将此功能视为TCP的心跳机制，需要注意的是：默认的心跳间隔是7200s即2小时。Netty默认关闭该功能。
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
@@ -63,9 +64,13 @@ public class Server {
     public static void main(String[] args){
         int port;
         if(args.length > 0) {
-            port = Integer.parseInt(args[0]);
+            try {
+                port = Integer.parseInt(args[0]);
+            }catch (NumberFormatException e){
+                port = 65432;
+            }
         } else {
-            port = 6543;
+            port = 65432;
         }
         new Server(port).start();
     }

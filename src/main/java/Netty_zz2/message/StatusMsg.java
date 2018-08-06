@@ -34,10 +34,18 @@ public class StatusMsg implements Serializable {
         return nowTaskSet;
     }
 
+    /**
+     * 添加任务
+     * @param assignTaskNum
+     */
     public void addNowTaskSet(Set<Task> assignTaskNum){
         nowTaskSet.addAll(assignTaskNum);
     }
 
+    /**
+     * 剥夺任务
+     * @param assignTaskSet
+     */
     public void removeNowTaskSet(Set<Task> assignTaskSet){
         nowTaskSet.removeAll(assignTaskSet);
     }
@@ -50,7 +58,6 @@ public class StatusMsg implements Serializable {
             stringBuilder.append(";");
         }
         stringBuilder.append(",\"maxTaskNum\":"+maxTaskNum+"}");
-//        return stringBuilder.toString();
-        return String.valueOf(nowTaskSet.size());
+        return stringBuilder.toString();
     }
 }

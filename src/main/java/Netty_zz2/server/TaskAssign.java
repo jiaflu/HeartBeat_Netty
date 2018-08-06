@@ -20,11 +20,12 @@ public class TaskAssign {
     private HashMap<String, Set<Task>> map;   //存储每个客户端发送的信息中的任务数
     private int need;       //需要重新分配多少个任务
     private int first;
-    private int sum;
     private int nowTaskNum, maxTaskNum, assignTaskNum, optTaskNum;
-    private int nowAllTaskNum;    //现有总任务数
-    private Set<Task> nowAllTaskSet;
-    private Set<Task> assignTaskSet,nowTaskSet;
+    private int nowAllTaskNum;    //未分配任务数
+    private Set<Task> nowAllTaskSet;    //未分配任务
+    private Set<Task> assignTaskSet;    //分配的任务
+    private Set<Task> nowTaskSet;     //已分配的任务
+    private int sum;
     private Set<Task> sumSet;
     private String socket;
 
@@ -34,6 +35,9 @@ public class TaskAssign {
         System.out.println(TASK_NUM);
     }
 
+    /**
+     * 初始化
+     */
     public void init(){
         nowAllTaskSet = new HashSet<Task>();
         sumSet = new HashSet<Task>();
@@ -44,6 +48,10 @@ public class TaskAssign {
         readConfigFile(CONFIG_FILE_PATH);
     }
 
+    /**
+     * 配置任务，配置文件是Task.ini
+     * @param path
+     */
     public void readConfigFile(String path){
         String lineString = null;
         FileInputStream fileInputStream = null;
@@ -61,15 +69,17 @@ public class TaskAssign {
             while (null != (lineString = bufferedReader.readLine())) {
                 String[] splitString = lineString.split("=");
                 if(']' == (splitString[1].charAt(splitString[1].length()-1))) {
-                    deviceNO = Integer.parseInt(splitString[1].substring(1, splitString[1].length() - 1));
+                    splitString[1] = splitString[1].substring(0,splitString[1].length()-1);
+                    deviceNO = Integer.parseInt(splitString[1].trim());
                 }
                 else{
-                    host = splitString[1].substring(1, splitString[1].length());
+                    host = splitString[1].trim();
                     nowAllTaskSet.add(new Task(deviceNO,host));
                 }
             }
-        }catch (IOException e){
-            System.err.println("读取配置文件失败");
+        }catch (Exception e){
+            System.err.println("读取配置文件失败，请检查配置文件");
+            System.exit(-1);
         }
     }
 
@@ -77,6 +87,12 @@ public class TaskAssign {
         this.statusMsg = statusMsg;
     }
 
+    /**
+     * 任务分配与回收，recall==true表示回收，false表示分配
+     * @param recall
+     * @param nowSocket
+     * @return
+     */
     public synchronized AssignTaskMsg assignTask(boolean recall,String nowSocket){
         if(recall){
             if(map.containsKey(nowSocket)){
@@ -179,9 +195,6 @@ public class TaskAssign {
         }
         map.put(nowSocket,nowTaskSet);
 
-        for(Task task : assignTaskSet){
-            System.out.println(task);
-        }
         return assignTaskMsg;
     }
 }

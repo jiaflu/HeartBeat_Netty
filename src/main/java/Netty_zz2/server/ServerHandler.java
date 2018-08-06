@@ -9,12 +9,20 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
+import java.util.Date;
+
 
 /**
  * Created by lujiafeng on 2018/7/28.
  */
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-    private static final TaskAssign task = new TaskAssign();
+    private static final TaskAssign taskAssign = new TaskAssign();
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("ServerHandler ChannelInactive. time: " + new Date());
+        taskAssign.assignTask(true, ctx.channel().remoteAddress().toString());
+    }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -33,8 +41,8 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     //每个信息入站都会调用
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        task.setStatusMsg((StatusMsg) msg);
-        AssignTaskMsg assignTaskMsg = task.assignTask(false,ctx.channel().remoteAddress().toString());
+        taskAssign.setStatusMsg((StatusMsg) msg);
+        AssignTaskMsg assignTaskMsg = taskAssign.assignTask(false,ctx.channel().remoteAddress().toString());
         ctx.write(assignTaskMsg);
     }
 
@@ -47,6 +55,6 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause){
         System.out.println("Exception!!!!!");
-        task.assignTask(true,ctx.channel().remoteAddress().toString());
+        //taskAssign.assignTask(true,ctx.channel().remoteAddress().toString());
     }
 }
